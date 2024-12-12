@@ -1,6 +1,11 @@
 from flask import Flask, render_template, request, jsonify, send_file
+"""
+This script uses YOLOv8 by Ultralytics.
+YOLOv8 is distributed under the AGPL-3.0 License.
+For more details, visit: https://github.com/ultralytics/ultralytics
+"""
 from ultralytics import YOLO
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
 import io
 import base64
 
@@ -30,6 +35,24 @@ def predict():
 
     # NumPy 배열을 PIL 이미지로 변환
     result_image = Image.fromarray(annotated_image)
+
+    # 텍스트 오버레이 추가
+    draw = ImageDraw.Draw(result_image)
+    font = ImageFont.truetype("arial.ttf", size=20)
+
+
+    # 추가할 텍스트 및 위치
+    text = "YOLOv8 - Licensed under AGPL-3.0"
+
+    # 텍스트 크기 계산
+    text_width, text_height = draw.textsize(text, font=font)
+
+    width, height = result_image.size
+    # 텍스트 위치: 가운데 하단
+    text_position = ((width - text_width) // 2, height - text_height - 10)  # 10px 여백
+
+    # 텍스트 추가
+    draw.text(text_position, text, fill="white", font=font)
 
     # 이미지를 Base64로 인코딩
     img_io = io.BytesIO()
